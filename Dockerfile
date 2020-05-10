@@ -34,8 +34,7 @@ ENV INSTALL_DIR /opt/intel/openvino
 RUN $INSTALL_DIR/install_dependencies/install_openvino_dependencies.sh
 
 WORKDIR /home
-RUN pip3 install setuptools
-RUN pip3 install jupyter
+RUN pip3 install --no-cache-dir setuptools jupyter
 ENV TINI_VER=v0.6.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VER}/tini /usr/bin/tini
 RUN chmod +x /usr/bin/tini
