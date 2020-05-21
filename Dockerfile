@@ -22,19 +22,21 @@ ARG DEPENDENCIES="autoconf \
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends ${DEPENDENCIES} && \
     rm -rf /var/lib/apt/lists/*
+    
 ARG DOWNLOAD_LINK=http://registrationcenter-download.intel.com/akdlm/irc_nas/16612/l_openvino_toolkit_p_2020.2.120.tgz
 WORKDIR /tmp
-COPY ./l_openvino_toolkit_p_2020.2.120.tgz ./l_openvino_toolkit_p_2020.2.120.tgz
-RUN tar -xzf ./l_openvino_toolkit_p_2020.2.120.tgz && \
-    cd l_openvino_toolkit_p_2020.2.120 && \
+ENV INSTALLDIR /opt/intel/openvino
+RUN curl -LOJ "${DOWNLOAD_LINK}" && \
+    tar -xzf ./*.tgz && \
+    cd l_openvino_toolkit* && \
     sed -i 's/decline/accept/g' silent.cfg && \
     ./install.sh -s silent.cfg && \
-    rm -rf /tmp/*
-ENV INSTALL_DIR /opt/intel/openvino
-RUN $INSTALL_DIR/install_dependencies/install_openvino_dependencies.sh
+    rm -rf /tmp/* && \
+    $INSTALLDIR/install_dependencies/install_openvino_dependencies.sh
 
 WORKDIR /home
-RUN pip3 install --no-cache-dir setuptools jupyter
+RUN pip3 install --no-cache-dir setuptools
+RUN pip3 install --no-cache-dir jupyter
 ENV TINI_VER=v0.6.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VER}/tini /usr/bin/tini
 RUN chmod +x /usr/bin/tini
